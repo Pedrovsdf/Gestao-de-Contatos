@@ -30,10 +30,12 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
     if (response.ok) {
         const data = await response.json();
-        token = data.token; // Token recebido do backend
-        localStorage.setItem('token', token); // Salva o token no localStorage
+        token = data.token;
+        const user_id = data.user.id;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user_id', user_id);
         console.log('Login bem-sucedido. Chamando mostrarContatos...');
-        mostrarContatos(); // Carrega os contatos após o login
+        mostrarContatos();
     } else {
         alert('Credenciais inválidas');
     }
@@ -148,23 +150,13 @@ function abrirFormularioContato(contato = null) {
 
 
 async function salvarContato() {
-    // Verifica se o user_id está presente no localStorage
-    const user_id = localStorage.getItem('user_id');
-    console.log('user_id:', user_id);  // Verifica se user_id está correto
-
-    // Se user_id não estiver presente, exibe um alerta
-    if (!user_id) {
-        alert('Usuário não autenticado.');
-        return;  // Não prossegue com a requisição
-    }
-
+    const token = localStorage.getItem('token');
     const contatoId = document.getElementById('contato-id').value;
     const contato = {
         nome: document.getElementById('nome').value,
         telefone: document.getElementById('telefone').value,
         email: document.getElementById('email-contato').value,
         observacoes: document.getElementById('observacoes').value,
-        user_id: user_id,  // Usa o user_id obtido do localStorage
     };
 
     console.log('Dados do contato a serem enviados:', contato);
@@ -243,6 +235,36 @@ async function excluirContato(id) {
         alert('Erro ao excluir contato. Verifique o console para mais detalhes.');
     }
 }
+
+// Função para exportar os contatos para CSV
+async function exportarContatos() {
+    try {
+        const status = document.getElementById('filtro-status').value;
+        const nome = document.getElementById('busca-nome').value;
+
+        const response = await fetch(`${API_URL}/contatos/exportar?status=${status}&nome=${encodeURIComponent(nome)}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
+
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'contatos.csv';  // Nome do arquivo CSV
+            link.click();
+            URL.revokeObjectURL(url);
+        } else {
+            const errorData = await response.json();
+            alert(`Erro ao exportar contatos: ${errorData.message || 'Erro desconhecido'}`);
+        }
+    } catch (error) {
+        console.error('Erro ao exportar contatos:', error);
+        alert('Erro ao exportar contatos. Verifique o console para mais detalhes.');
+    }
+}
+
 
 
 document.getElementById('logout').addEventListener('click', () => {
