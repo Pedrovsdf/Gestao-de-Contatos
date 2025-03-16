@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Contato;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
+
 
 class ContatoController extends Controller
 {
@@ -47,7 +49,7 @@ class ContatoController extends Controller
         $contato->telefone = $request->telefone;
         $contato->email = $request->email;
         $contato->observacoes = $request->observacoes;
-        $contato->user_id = $user->id; // Garante que o usuário autenticado seja associado
+        $contato->user_id = auth()->id(); // Garante que o usuário autenticado seja associado
         $contato->save();
 
         return response()->json(['message' => 'Contato salvo com sucesso'], 201);
@@ -105,8 +107,6 @@ class ContatoController extends Controller
     }
 
 
-
-
     public function destroy($id)
     {
         $contato = Contato::findOrFail($id);
@@ -120,4 +120,43 @@ class ContatoController extends Controller
         $contato->delete();
         return response()->json(['message' => 'Contato excluído com sucesso'], 200);
     }
+
+    public function exportarContatos(Request $request)
+    {
+        $user = auth()->user(); // Obtém o usuário autenticado
+        $status = $request->query('status', 'todos'); // Filtro de status
+        $nome = $request->query('nome', ''); // Filtro por nome
+
+        $query = $user->contatos();
+
+        // Filtra por status
+        if ($status === 'excluido') {
+            $query->onlyTrashed();
+        } elseif ($status === 'ativo') {
+            $query->where('status', 'ativo');
+        }
+
+        // Filtra por nome
+        if (!empty($nome)) {
+            $query->where('nome', 'like', "%$nome%");
+        }
+
+        $contatos = $query->get(); // Pega os contatos
+
+        // Define o cabeçalho do arquivo CSV
+        $csvData = "Nome,Telefone,Email,Observações,Status\n";
+
+        // Preenche os dados no arquivo CSV
+        foreach ($contatos as $contato) {
+            $csvData .= "{$contato->nome},{$contato->telefone},{$contato->email},{$contato->observacoes},{$contato->status}\n";
+        }
+
+        // Retorna o arquivo CSV
+        return response($csvData)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="contatos.csv"');
+    }
+
+
 }
+
