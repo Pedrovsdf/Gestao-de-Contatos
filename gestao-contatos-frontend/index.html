@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Contatos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Gestão de Contatos</a>
+        <div class="navbar-nav ms-auto">
+            <button class="btn btn-outline-light" id="logout">Sair</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- Formulário de Login/Registro -->
+    <div id="auth-section">
+        <h2>Login</h2>
+        <form id="login-form">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Entrar</button>
+            <button type="button" class="btn btn-link" onclick="showRegisterForm()">Registrar</button>
+        </form>
+
+        <form id="register-form" style="display: none;">
+            <h2>Registrar</h2>
+            <div class="mb-3">
+                <label for="name" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="mb-3">
+                <label for="email-register" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email-register" required>
+            </div>
+            <div class="mb-3">
+                <label for="password-register" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="password-register" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Registrar</button>
+            <button type="button" class="btn btn-link" onclick="showLoginForm()">Já tem uma conta? Faça login</button>
+        </form>
+    </div>
+
+    <!-- Listagem de Contatos -->
+    <div id="contatos-section" style="display: none;">
+        <h2>Meus Contatos</h2>
+        <button class="btn btn-primary mb-3" onclick="abrirFormularioContato()">Adicionar Contato</button>
+
+        <!-- Controles de Filtro e Busca -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <select class="form-select" id="filtro-status" onchange="mostrarContatos()">
+                    <option value="todos">Todos</option>
+                    <option value="ativo">Ativos</option>
+                    <option value="excluido">Excluídos</option>
+                </select>
+            </div>
+            <div class="col-md-8">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="busca-nome" placeholder="Buscar contato por nome">
+                    <button class="btn btn-primary" type="button" onclick="mostrarContatos()">Buscar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Contatos -->
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Email</th>
+                <th>Ações</th>
+            </tr>
+            </thead>
+            <tbody id="tabela-contatos">
+            <!-- Contatos serão carregados aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para Adicionar/Editar Contato -->
+    <div class="modal fade" id="modal-contato">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar/Editar Contato</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-contato">
+                        <input type="hidden" id="contato-id">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="nome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="telefone" class="form-label">Telefone</label>
+                            <input type="text" class="form-control" id="telefone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email-contato" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email-contato" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="observacoes" class="form-label">Observações</label>
+                            <textarea class="form-control" id="observacoes"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" onclick="salvarContato()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

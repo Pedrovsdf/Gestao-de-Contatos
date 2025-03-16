@@ -1,0 +1,12 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+#auth-section, #contatos-section {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.table {
+    margin-top: 20px;
+}
