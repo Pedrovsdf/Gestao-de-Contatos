@@ -1,28 +1,28 @@
-# Usando uma imagem base do PHP com suporte ao FPM
+# Usar a imagem do PHP com as extensões necessárias para Laravel
 FROM php:8.2-fpm
 
-# Instalar dependências do sistema necessárias para o Laravel
+# Instalar dependências do sistema e o Composer
 RUN apt-get update && apt-get install -y \
-    libpng-dev libjpeg-dev libfreetype6-dev \
-    zip git curl && \
-    apt-get clean && \
-    docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install gd pdo pdo_mysql
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    zip \
+    git \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Instalar o Composer (gerenciador de dependências PHP)
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Definir o diretório de trabalho onde a aplicação estará
+# Definir o diretório de trabalho
 WORKDIR /var/www
 
-# Copiar os arquivos do projeto para dentro do contêiner
+# Copiar o código da aplicação para o contêiner
 COPY . .
 
-# Instalar dependências do Laravel (composer install)
+# Instalar dependências PHP do Composer
 RUN composer install --no-dev --optimize-autoloader
 
-# Expor a porta para acessar o servidor
-EXPOSE 9000
+# Expor a porta 8000 para o PHP-FPM
+EXPOSE 8000
 
-# Comando para iniciar o PHP-FPM
+# Iniciar o servidor PHP-FPM
 CMD ["php-fpm"]
